@@ -1,11 +1,13 @@
 package vn.com.gsoft.security.controller;
 
+import com.google.gson.Gson;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
@@ -22,9 +24,13 @@ import vn.com.gsoft.security.model.dto.ChooseDepartment;
 import vn.com.gsoft.security.model.dto.JwtRequest;
 import vn.com.gsoft.security.model.dto.JwtResponse;
 import vn.com.gsoft.security.model.dto.LoginQr;
+import vn.com.gsoft.security.model.system.MessageDTO;
 import vn.com.gsoft.security.model.system.Profile;
+import vn.com.gsoft.security.service.KafkaProducer;
 import vn.com.gsoft.security.service.UserService;
 import vn.com.gsoft.security.util.system.JwtTokenUtil;
+
+import java.util.UUID;
 
 
 @RestController
@@ -42,6 +48,11 @@ public class AuthController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private KafkaProducer kafkaProducer;
+
+    @Value("${wnt.kafka.internal.producer.topic.login}")
+    private String producerTopic;
 
     @PostMapping(value = "/login")
     public ResponseEntity<JwtResponse> authenticate(
@@ -120,7 +131,7 @@ public class AuthController {
     }
 
     @PostMapping(value = "/login-qr")
-    public ResponseEntity<String> authenticateQr(@RequestBody @Valid LoginQr loginQr, Authentication authentication) {
+    public ResponseEntity<String> authenticateQr(@RequestBody @Valid LoginQr loginQr) {
 
         try {
             Profile profile = (Profile) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -128,7 +139,13 @@ public class AuthController {
             String token = jwtTokenUtil.generateToken(profile.getUsername());
             String refreshToken = jwtTokenUtil.generateRefreshToken(profile.getUsername());
             // send socket.io trong loginQr
-
+            Gson gson = new Gson();
+            MessageDTO message = new MessageDTO();
+            message.setId(UUID.randomUUID().toString());
+            message.setUuid(loginQr.getUuid());
+            message.setData(gson.toJson(new JwtResponse(token, refreshToken)));
+            String messageStr = gson.toJson(message);
+            kafkaProducer.sendInternal(producerTopic, messageStr);
             return ResponseEntity.ok("Thành công!");
         } catch (Exception ex) {
             log.error("Authentication error", ex);
