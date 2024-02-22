@@ -1,0 +1,12 @@
+# Spring
+spring:
+  application:
+    name: wnt-security
+  profiles:
+    active: prod
+  cloud:
+    config:
+      uri: http://localhost:30004
+      label: latest
+      username: ENCL(Bq7G/JTejfXoJCk8nDp6iw==)
+      password: ENCL(r8wZZemi/0rdGJOBDoPlFw==)
