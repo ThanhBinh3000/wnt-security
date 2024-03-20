@@ -20,13 +20,16 @@ public class Role extends BaseEntity {
 
     @Column(name = "MaNhaThuoc")
     private Long maNhaThuoc;
-    @Column(name = "Name")
+
+    @Column(name = "RoleName")
     private String name;
 
     @Column(name = "IsDeleted")
     private Boolean isDeleted;
+
     @Column(name = "Description")
     private String description;
+
     @Column(name = "Type")
     private Integer type;
 }
