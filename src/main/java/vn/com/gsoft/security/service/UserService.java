@@ -9,5 +9,5 @@ public interface UserService extends BaseService {
 
     Optional<Profile> findUserByUsername(String token);
 
-    Optional<Profile> chooseDepartment(String jwtToken);
+    Optional<Profile> chooseNhaThuocs(String jwtToken);
 }

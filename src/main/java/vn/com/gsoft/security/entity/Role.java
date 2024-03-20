@@ -19,7 +19,7 @@ public class Role extends BaseEntity {
     private Long id;
 
     @Column(name = "MaNhaThuoc")
-    private Long departmentCode;
+    private Long maNhaThuoc;
     @Column(name = "Name")
     private String name;
 

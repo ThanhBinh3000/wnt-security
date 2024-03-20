@@ -20,7 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
-import vn.com.gsoft.security.model.dto.ChooseDepartment;
+import vn.com.gsoft.security.model.dto.ChooseNhaThuocs;
 import vn.com.gsoft.security.model.dto.JwtRequest;
 import vn.com.gsoft.security.model.dto.JwtResponse;
 import vn.com.gsoft.security.model.dto.LoginQr;
@@ -84,17 +84,17 @@ public class AuthController {
         }
     }
 
-    @PutMapping(value = "/choose-department")
-    public void chooseDepartment(
-            @RequestBody @Valid ChooseDepartment chooseDepartment, Authentication authentication, HttpServletRequest request) {
+    @PutMapping(value = "/choose-nha-thuocs")
+    public void chooseNhaThuocs(
+            @RequestBody @Valid ChooseNhaThuocs chooseNhaThuocs, Authentication authentication, HttpServletRequest request) {
         String requestTokenHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             String jwtToken = requestTokenHeader.substring(7);
             RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
             if (requestAttributes != null) {
-                requestAttributes.setAttribute("chooseDepartment", chooseDepartment, RequestAttributes.SCOPE_REQUEST);
+                requestAttributes.setAttribute("chooseNhaThuocs", chooseNhaThuocs, RequestAttributes.SCOPE_REQUEST);
             }
-            userService.chooseDepartment(jwtToken);
+            userService.chooseNhaThuocs(jwtToken);
         }
     }
 

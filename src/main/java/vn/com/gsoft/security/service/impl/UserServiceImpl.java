@@ -13,13 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import vn.com.gsoft.security.constant.CachingConstant;
-import vn.com.gsoft.security.constant.UserStatus;
-import vn.com.gsoft.security.entity.Department;
+import vn.com.gsoft.security.entity.NhaThuocs;
 import vn.com.gsoft.security.entity.Role;
 import vn.com.gsoft.security.entity.User;
-import vn.com.gsoft.security.model.dto.ChooseDepartment;
+import vn.com.gsoft.security.model.dto.ChooseNhaThuocs;
 import vn.com.gsoft.security.model.system.Profile;
-import vn.com.gsoft.security.repository.DepartmentRepository;
+import vn.com.gsoft.security.repository.NhaThuocsRepository;
 import vn.com.gsoft.security.repository.RoleRepository;
 import vn.com.gsoft.security.repository.UserRepository;
 import vn.com.gsoft.security.service.UserService;
@@ -35,7 +34,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
-    private DepartmentRepository departmentRepository;
+    private NhaThuocsRepository nhaThuocsRepository;
     @Autowired
     private RoleRepository roleRepository;
 
@@ -54,13 +53,13 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
             throw new BadCredentialsException("Không tìm thấy username!");
         }
         Set<SimpleGrantedAuthority> privileges = new HashSet<>();
-        List<Department> departments = departmentRepository.findByUserId(user.get().getId());
+        List<NhaThuocs> nhaThuocs = nhaThuocsRepository.findByMaNhaThuoc(user.get().getMaNhaThuoc());
         return Optional.of(new Profile(
                 user.get().getId(),
                 user.get().getFullName(),
                 null,
                 null,
-                departments,
+                nhaThuocs,
                 user.get().getUsername(),
                 user.get().getPassword(),
                 user.get().getHoatDong() && (user.get().getEnableNT() != null ? user.get().getEnableNT() : true),
@@ -73,27 +72,27 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
 
     @Override
     @CachePut(value = CachingConstant.USER)
-    public Optional<Profile> chooseDepartment(String token) {
+    public Optional<Profile> chooseNhaThuocs(String token) {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null) {
-            ChooseDepartment chooseDepartment = (ChooseDepartment) requestAttributes.getAttribute("chooseDepartment", RequestAttributes.SCOPE_REQUEST);
-            if (chooseDepartment != null) {
+            ChooseNhaThuocs chooseNhaThuocs = (ChooseNhaThuocs) requestAttributes.getAttribute("chooseNhaThuocs", RequestAttributes.SCOPE_REQUEST);
+            if (chooseNhaThuocs != null) {
                 String username = jwtTokenUtil.getUsernameFromToken(token);
                 Optional<User> user = userRepository.findByUsername(username);
                 if (!user.isPresent()) {
                     throw new BadCredentialsException("Không tìm thấy username!");
                 }
                 Set<SimpleGrantedAuthority> privileges = new HashSet<>();
-                List<Department> departments = departmentRepository.findByUserId(user.get().getId());
-                Optional<Department> department = departmentRepository.findById(chooseDepartment.getId());
-                List<Role> roles = roleRepository.findByUserIdAndDepartmentId(user.get().getId(), department.get().getId());
+                List<NhaThuocs> nhaThuocs = nhaThuocsRepository.findByMaNhaThuoc(user.get().getMaNhaThuoc());
+                Optional<NhaThuocs> nhaThuoc = nhaThuocsRepository.findById(chooseNhaThuocs.getId());
+                List<Role> roles = roleRepository.findByUserIdAndMaNhaThuoc(user.get().getId(), nhaThuoc.get().getMaNhaThuoc());
 
                 return Optional.of(new Profile(
                         user.get().getId(),
                         user.get().getFullName(),
-                        department.get(),
+                        nhaThuoc.get(),
                         roles,
-                        departments,
+                        nhaThuocs,
                         user.get().getUsername(),
                         user.get().getPassword(),
                         user.get().getHoatDong() && (user.get().getEnableNT() != null ? user.get().getEnableNT() : true),
