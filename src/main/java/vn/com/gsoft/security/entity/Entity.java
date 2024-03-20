@@ -6,15 +6,18 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Data
 @jakarta.persistence.Entity
-@Table(name = "entity")
+@Table(name = "Entity")
 @EntityListeners(AuditingEntityListener.class)
 public class Entity extends BaseEntity {
     @Id
     private Long id;
 
-    @Column(name = "CODE")
+    @Column(name = "Code")
     private Long code;
 
-    @Column(name = "NAME")
+    @Column(name = "Name")
     private Long name;
+
+    @Column(name = "Type")
+    private Integer type;
 }

@@ -1,9 +1,7 @@
 package vn.com.gsoft.security.entity;
 
+import jakarta.persistence.*;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -13,11 +11,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "userrole")
+@Table(name = "UserRole")
 @EntityListeners(AuditingEntityListener.class)
 public class UserRole extends BaseEntity{
     @Id
     private Long id;
+    @Column(name = "RoleId")
     private Long roleId;
+    @Column(name = "UserId")
     private Long userId;
 }

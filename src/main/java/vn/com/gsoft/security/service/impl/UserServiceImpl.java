@@ -53,19 +53,17 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
         if (!user.isPresent()) {
             throw new BadCredentialsException("Không tìm thấy username!");
         }
-        Long entityTypeId = user.get().getEntityTypeId();
         Set<SimpleGrantedAuthority> privileges = new HashSet<>();
         List<Department> departments = departmentRepository.findByUserId(user.get().getId());
         return Optional.of(new Profile(
                 user.get().getId(),
                 user.get().getFullName(),
-                entityTypeId,
                 null,
                 null,
                 departments,
                 user.get().getUsername(),
                 user.get().getPassword(),
-                user.get().getStatus() == UserStatus.ACTIVE,
+                user.get().getHoatDong() && (user.get().getEnableNT() != null ? user.get().getEnableNT() : true),
                 true,
                 true,
                 true,
@@ -85,7 +83,6 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
                 if (!user.isPresent()) {
                     throw new BadCredentialsException("Không tìm thấy username!");
                 }
-                Long entityTypeId = user.get().getEntityTypeId();
                 Set<SimpleGrantedAuthority> privileges = new HashSet<>();
                 List<Department> departments = departmentRepository.findByUserId(user.get().getId());
                 Optional<Department> department = departmentRepository.findById(chooseDepartment.getId());
@@ -94,13 +91,12 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
                 return Optional.of(new Profile(
                         user.get().getId(),
                         user.get().getFullName(),
-                        entityTypeId,
                         department.get(),
                         roles,
                         departments,
                         user.get().getUsername(),
                         user.get().getPassword(),
-                        user.get().getStatus() == UserStatus.ACTIVE,
+                        user.get().getHoatDong() && (user.get().getEnableNT() != null ? user.get().getEnableNT() : true),
                         true,
                         true,
                         true,

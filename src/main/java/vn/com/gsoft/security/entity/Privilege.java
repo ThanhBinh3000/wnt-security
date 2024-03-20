@@ -1,5 +1,6 @@
 package vn.com.gsoft.security.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -12,26 +13,16 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "privilege")
+@Table(name = "Privilege")
 public class Privilege extends BaseEntity {
     @Id
     private Long id;
-
+    @Column(name = "Code")
     private String code;
-
+    @Column(name = "ParentCode")
     private String parentCode;
-
+    @Column(name = "Name")
     private String name;
-
-    private String icon;
-
-    private Integer type;
-
-    private Integer sort;
-
-    private String meta;
-
-    private String path;
-
+    @Column(name = "Enable")
     private Boolean enable;
 }

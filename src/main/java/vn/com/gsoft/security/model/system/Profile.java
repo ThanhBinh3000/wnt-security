@@ -17,7 +17,6 @@ public class Profile extends User {
 
     private String fullName;
 
-    private Long entityTypeId;
 
     private Department department;
 
@@ -33,11 +32,10 @@ public class Profile extends User {
         super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
     }
 
-    public Profile(Long id, String fullName, Long entityTypeId, Department department, List<Role> roles, List<Department> departments, String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
+    public Profile(Long id, String fullName, Department department, List<Role> roles, List<Department> departments, String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
         this.id = id;
         this.fullName = fullName;
-        this.entityTypeId = entityTypeId;
         this.department = department;
         this.roles = roles;
         this.departments = departments;
