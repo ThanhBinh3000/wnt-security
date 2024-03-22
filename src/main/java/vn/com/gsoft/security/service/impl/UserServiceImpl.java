@@ -118,6 +118,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
     }
 
     @Override
+    @Cacheable(value = CachingConstant.USER)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return findUserByUsername(username).get();
     }
