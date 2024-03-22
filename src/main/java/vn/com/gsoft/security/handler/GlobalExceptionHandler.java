@@ -2,7 +2,6 @@ package vn.com.gsoft.security.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
@@ -29,8 +28,6 @@ import java.util.Map;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @Autowired
-    private MessageSource messageSource;
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> resourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
@@ -65,10 +62,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OptimisticLockingFailureException.class)
     public ResponseEntity<?> optimisticLockingException(OptimisticLockingFailureException ex, WebRequest request) {
         ErrorDetail errorDetail = new ErrorDetail(new Date(),
-                messageSource.getMessage(
-                        "error.optimistic-locking",
-                        new Object[0],
-                        LocaleContextHolder.getLocale()),
+                "Error",
                 "",
                 request.getDescription(false));
         return new ResponseEntity<>(errorDetail, HttpStatus.CONFLICT);
@@ -98,10 +92,7 @@ public class GlobalExceptionHandler {
         });
 
         if (!CollectionUtils.isEmpty(errors)) {
-            errorDetail.setMessage(messageSource.getMessage(
-                    "error.validation",
-                    new Object[0],
-                    LocaleContextHolder.getLocale()));
+            errorDetail.setMessage("Error validation!");
             errorDetail.setDetails(errors);
         }
 

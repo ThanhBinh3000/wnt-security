@@ -44,15 +44,15 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
     private PrivilegeRepository privilegeRepository;
 
     @Override
-    @Cacheable(value = CachingConstant.USER)
     public Optional<Profile> findUserByToken(String token) {
         String username = jwtTokenUtil.getUsernameFromToken(token);
-        log.warn("Cache findUserByToken missing: {}", username);
         return findUserByUsername(username);
     }
 
     @Override
+    @Cacheable(value = CachingConstant.USER)
     public Optional<Profile> findUserByUsername(String username) {
+        log.warn("Cache findUserByToken missing: {}", username);
         Optional<UserProfile> user = userProfileRepository.findByUserName(username);
         if (!user.isPresent()) {
             throw new BadCredentialsException("Không tìm thấy username!");
@@ -119,6 +119,6 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return null;
+        return findUserByUsername(username).get();
     }
 }

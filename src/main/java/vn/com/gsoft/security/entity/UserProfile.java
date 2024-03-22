@@ -7,13 +7,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "UserProfile")
-public class UserProfile {
+public class UserProfile implements Serializable {
     @Id
     @Column(name = "UserId")
     private Long userId;

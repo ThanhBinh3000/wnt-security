@@ -1,18 +1,32 @@
 package vn.com.gsoft.security.model.system;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import vn.com.gsoft.security.entity.NhaThuocs;
 import vn.com.gsoft.security.entity.Role;
 
-import java.util.Collection;
+import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
-public class Profile extends User {
+@NoArgsConstructor
+public class Profile implements UserDetails, Serializable {
+    private static final long serialVersionUID = 620L;
+    private static final Log logger = LogFactory.getLog(Profile.class);
+    private String password;
+    private String username;
+    private Set<SimpleGrantedAuthority> authorities;
+    private boolean accountNonExpired;
+    private boolean accountNonLocked;
+    private boolean credentialsNonExpired;
+    private boolean enabled;
     private Long id;
 
     private String fullName;
@@ -24,20 +38,19 @@ public class Profile extends User {
 
     private List<NhaThuocs> nhaThuocs;
 
-    public Profile(String username, String password, Collection<? extends GrantedAuthority> authorities) {
-        super(username, password, authorities);
-    }
 
-    public Profile(String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
-        super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
-    }
-
-    public Profile(Long id, String fullName, NhaThuocs nhaThuoc, List<Role> roles, List<NhaThuocs> nhaThuocs, String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
-        super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
+    public Profile(Long id, String fullName, NhaThuocs nhaThuoc, List<Role> roles, List<NhaThuocs> nhaThuocs, String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Set<SimpleGrantedAuthority> authorities) {
         this.id = id;
         this.fullName = fullName;
         this.nhaThuoc = nhaThuoc;
         this.roles = roles;
         this.nhaThuocs = nhaThuocs;
+        this.username = username;
+        this.password = password;
+        this.enabled = enabled;
+        this.accountNonExpired = accountNonExpired;
+        this.credentialsNonExpired = credentialsNonExpired;
+        this.accountNonLocked = accountNonLocked;
+        this.authorities = authorities;
     }
 }

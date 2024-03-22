@@ -8,8 +8,6 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -39,9 +37,6 @@ public class AuthController {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
-    private MessageSource messageSource;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -77,10 +72,7 @@ public class AuthController {
             return ResponseEntity.ok(new JwtResponse(token, refreshToken));
         } catch (Exception ex) {
             log.error("Authentication error", ex);
-            throw new BadCredentialsException(messageSource.getMessage(
-                    "AbstractUserDetailsAuthenticationProvider.badCredentials",
-                    new Object[0],
-                    LocaleContextHolder.getLocale()));
+            throw new BadCredentialsException("Username or password wrong!");
         }
     }
 
@@ -124,10 +116,7 @@ public class AuthController {
                 log.error("JWT Token has expired");
             }
         }
-        throw new BadCredentialsException(messageSource.getMessage(
-                "AbstractUserDetailsAuthenticationProvider.badCredentials",
-                new Object[0],
-                LocaleContextHolder.getLocale()));
+        throw new BadCredentialsException("Token invalid!");
     }
 
     @PostMapping(value = "/login-qr")
@@ -149,10 +138,7 @@ public class AuthController {
             return ResponseEntity.ok("Thành công!");
         } catch (Exception ex) {
             log.error("Authentication error", ex);
-            throw new BadCredentialsException(messageSource.getMessage(
-                    "AbstractUserDetailsAuthenticationProvider.badCredentials",
-                    new Object[0],
-                    LocaleContextHolder.getLocale()));
+            throw new BadCredentialsException("Token invalid!");
         }
     }
 }
