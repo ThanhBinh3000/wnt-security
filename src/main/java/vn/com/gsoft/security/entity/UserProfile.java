@@ -57,5 +57,7 @@ public class UserProfile {
     private String tokenDevice2;
     @Column(name = "MobileDeviceId")
     private String mobileDeviceId;
+    @Column(name = "EntityId")
+    private Long entityId;
 }
 

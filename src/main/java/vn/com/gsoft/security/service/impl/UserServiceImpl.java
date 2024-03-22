@@ -14,17 +14,20 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import vn.com.gsoft.security.constant.CachingConstant;
 import vn.com.gsoft.security.entity.NhaThuocs;
+import vn.com.gsoft.security.entity.Privilege;
 import vn.com.gsoft.security.entity.Role;
 import vn.com.gsoft.security.entity.UserProfile;
 import vn.com.gsoft.security.model.dto.ChooseNhaThuocs;
 import vn.com.gsoft.security.model.system.Profile;
 import vn.com.gsoft.security.repository.NhaThuocsRepository;
+import vn.com.gsoft.security.repository.PrivilegeRepository;
 import vn.com.gsoft.security.repository.RoleRepository;
 import vn.com.gsoft.security.repository.UserProfileRepository;
 import vn.com.gsoft.security.service.UserService;
 import vn.com.gsoft.security.util.system.JwtTokenUtil;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -37,6 +40,8 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
     private NhaThuocsRepository nhaThuocsRepository;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private PrivilegeRepository privilegeRepository;
 
     @Override
     @Cacheable(value = CachingConstant.USER)
@@ -86,7 +91,13 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
                 List<NhaThuocs> nhaThuocs = nhaThuocsRepository.findByMaNhaThuoc(user.get().getMaNhaThuoc());
                 Optional<NhaThuocs> nhaThuoc = nhaThuocsRepository.findById(chooseNhaThuocs.getId());
                 List<Role> roles = roleRepository.findByUserIdAndMaNhaThuoc(user.get().getUserId(), nhaThuoc.get().getMaNhaThuoc());
-
+                List<Long> roleIds = roles.stream()
+                        .map(Role::getRoleId) // Extract the ID from each role
+                        .collect(Collectors.toList());
+                List<Privilege> privilegeObjs = privilegeRepository.findByRoleIdInAndMaNhaThuocAndEntityId(roleIds, nhaThuoc.get().getMaNhaThuoc(), user.get().getEntityId());
+                for(Privilege p : privilegeObjs){
+                    privileges.add(new SimpleGrantedAuthority(p.getCode()));
+                }
                 return Optional.of(new Profile(
                         user.get().getUserId(),
                         user.get().getTenDayDu(),
