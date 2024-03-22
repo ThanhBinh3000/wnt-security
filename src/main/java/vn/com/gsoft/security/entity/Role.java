@@ -1,35 +1,32 @@
 package vn.com.gsoft.security.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
-import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "Role")
-@EntityListeners(AuditingEntityListener.class)
-public class Role extends BaseEntity {
+public class Role {
     @Id
     @Column(name = "RoleId")
-    private Long id;
-
-    @Column(name = "MaNhaThuoc")
-    private Long maNhaThuoc;
-
+    private Long roleId;
     @Column(name = "RoleName")
-    private String name;
-
+    private String roleName;
     @Column(name = "IsDeleted")
     private Boolean isDeleted;
-
+    @Column(name = "MaNhaThuoc")
+    private String maNhaThuoc;
     @Column(name = "Description")
     private String description;
-
     @Column(name = "Type")
     private Integer type;
 }
+

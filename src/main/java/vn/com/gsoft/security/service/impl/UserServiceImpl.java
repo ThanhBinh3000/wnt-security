@@ -15,12 +15,12 @@ import org.springframework.web.context.request.RequestContextHolder;
 import vn.com.gsoft.security.constant.CachingConstant;
 import vn.com.gsoft.security.entity.NhaThuocs;
 import vn.com.gsoft.security.entity.Role;
-import vn.com.gsoft.security.entity.User;
+import vn.com.gsoft.security.entity.UserProfile;
 import vn.com.gsoft.security.model.dto.ChooseNhaThuocs;
 import vn.com.gsoft.security.model.system.Profile;
 import vn.com.gsoft.security.repository.NhaThuocsRepository;
 import vn.com.gsoft.security.repository.RoleRepository;
-import vn.com.gsoft.security.repository.UserRepository;
+import vn.com.gsoft.security.repository.UserProfileRepository;
 import vn.com.gsoft.security.service.UserService;
 import vn.com.gsoft.security.util.system.JwtTokenUtil;
 
@@ -30,7 +30,7 @@ import java.util.*;
 @Slf4j
 public class UserServiceImpl extends BaseServiceImpl implements UserService, UserDetailsService {
     @Autowired
-    private UserRepository userRepository;
+    private UserProfileRepository userProfileRepository;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
@@ -48,19 +48,19 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
 
     @Override
     public Optional<Profile> findUserByUsername(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<UserProfile> user = userProfileRepository.findByUserName(username);
         if (!user.isPresent()) {
             throw new BadCredentialsException("Không tìm thấy username!");
         }
         Set<SimpleGrantedAuthority> privileges = new HashSet<>();
         List<NhaThuocs> nhaThuocs = nhaThuocsRepository.findByMaNhaThuoc(user.get().getMaNhaThuoc());
         return Optional.of(new Profile(
-                user.get().getId(),
-                user.get().getFullName(),
+                user.get().getUserId(),
+                user.get().getTenDayDu(),
                 null,
                 null,
                 nhaThuocs,
-                user.get().getUsername(),
+                user.get().getUserName(),
                 user.get().getPassword(),
                 user.get().getHoatDong() && (user.get().getEnableNT() != null ? user.get().getEnableNT() : true),
                 true,
@@ -78,22 +78,22 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
             ChooseNhaThuocs chooseNhaThuocs = (ChooseNhaThuocs) requestAttributes.getAttribute("chooseNhaThuocs", RequestAttributes.SCOPE_REQUEST);
             if (chooseNhaThuocs != null) {
                 String username = jwtTokenUtil.getUsernameFromToken(token);
-                Optional<User> user = userRepository.findByUsername(username);
+                Optional<UserProfile> user = userProfileRepository.findByUserName(username);
                 if (!user.isPresent()) {
                     throw new BadCredentialsException("Không tìm thấy username!");
                 }
                 Set<SimpleGrantedAuthority> privileges = new HashSet<>();
                 List<NhaThuocs> nhaThuocs = nhaThuocsRepository.findByMaNhaThuoc(user.get().getMaNhaThuoc());
                 Optional<NhaThuocs> nhaThuoc = nhaThuocsRepository.findById(chooseNhaThuocs.getId());
-                List<Role> roles = roleRepository.findByUserIdAndMaNhaThuoc(user.get().getId(), nhaThuoc.get().getMaNhaThuoc());
+                List<Role> roles = roleRepository.findByUserIdAndMaNhaThuoc(user.get().getUserId(), nhaThuoc.get().getMaNhaThuoc());
 
                 return Optional.of(new Profile(
-                        user.get().getId(),
-                        user.get().getFullName(),
+                        user.get().getUserId(),
+                        user.get().getTenDayDu(),
                         nhaThuoc.get(),
                         roles,
                         nhaThuocs,
-                        user.get().getUsername(),
+                        user.get().getUserName(),
                         user.get().getPassword(),
                         user.get().getHoatDong() && (user.get().getEnableNT() != null ? user.get().getEnableNT() : true),
                         true,
