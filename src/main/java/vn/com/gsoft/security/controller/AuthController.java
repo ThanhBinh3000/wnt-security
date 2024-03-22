@@ -122,17 +122,16 @@ public class AuthController {
     @PostMapping(value = "/login-qr")
     public ResponseEntity<String> authenticateQr(@RequestBody @Valid LoginQr loginQr) {
         try {
-//            Profile profile = (Profile) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Profile profile = (Profile) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //            // Trả về jwt cho người dùng.
-//            String token = jwtTokenUtil.generateToken(profile.getUsername());
-//            String refreshToken = jwtTokenUtil.generateRefreshToken(profile.getUsername());
+            String token = jwtTokenUtil.generateToken(profile.getUsername());
+            String refreshToken = jwtTokenUtil.generateRefreshToken(profile.getUsername());
             // send socket.io trong loginQr
             Gson gson = new Gson();
             MessageDTO message = new MessageDTO();
             message.setId(UUID.randomUUID().toString());
             message.setUuid(loginQr.getUuid());
-//            message.setData(gson.toJson(new JwtResponse(token, refreshToken)));
-            message.setData("ok");
+            message.setData(gson.toJson(new JwtResponse(token, refreshToken)));
             String messageStr = gson.toJson(message);
             kafkaProducer.sendInternal(producerTopic, messageStr);
             return ResponseEntity.ok("Thành công!");
