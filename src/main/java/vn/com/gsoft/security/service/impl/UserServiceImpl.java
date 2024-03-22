@@ -52,7 +52,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
     @Override
     @Cacheable(value = CachingConstant.USER)
     public Optional<Profile> findUserByUsername(String username) {
-        log.warn("Cache findUserByToken missing: {}", username);
+        log.warn("Cache findUserByUsername missing: {}", username);
         Optional<UserProfile> user = userProfileRepository.findByUserName(username);
         if (!user.isPresent()) {
             throw new BadCredentialsException("Không tìm thấy username!");
