@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface UserProfileRepository extends CrudRepository<UserProfile, Long> {
     Optional<UserProfile> findByUserName(String username);
+
 }

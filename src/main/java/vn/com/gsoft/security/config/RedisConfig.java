@@ -27,9 +27,6 @@ public class RedisConfig {
     @Value("${cache.duration.default}")
     private int durationDefault;
 
-    @Value("${cache.duration.user}")
-    private int durationUser;
-
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(redisHost, redisPort);
@@ -44,7 +41,6 @@ public class RedisConfig {
 
         return RedisCacheManager.builder(redisConnectionFactory())
                 .cacheDefaults(cacheConfig)
-                .withCacheConfiguration(CachingConstant.USER, defaultCacheConfig(Duration.ofMinutes(durationUser)))
                 .build();
     }
 

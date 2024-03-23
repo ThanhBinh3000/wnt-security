@@ -9,6 +9,8 @@ import java.util.List;
 
 @Repository
 public interface RoleRepository extends CrudRepository<Role, Long> {
-    @Query(value = "SELECT r from Role r join UserRole ur on ur.roleId = r.id  where ur.id = ?1 and r.maNhaThuoc =?2")
+    @Query(value = "SELECT r from Role r " +
+            "join UserRole ur on ur.roleId = r.roleId  " +
+            "where ur.userId = ?1 and (r.type = 0 or r.maNhaThuoc = ?2)")
     List<Role> findByUserIdAndMaNhaThuoc(Long userId, String maNhaThuoc);
 }

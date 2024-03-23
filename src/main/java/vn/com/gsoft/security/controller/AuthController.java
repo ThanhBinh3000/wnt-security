@@ -25,6 +25,7 @@ import vn.com.gsoft.security.model.dto.LoginQr;
 import vn.com.gsoft.security.model.system.MessageDTO;
 import vn.com.gsoft.security.model.system.Profile;
 import vn.com.gsoft.security.service.KafkaProducer;
+import vn.com.gsoft.security.service.RedisListService;
 import vn.com.gsoft.security.service.UserService;
 import vn.com.gsoft.security.util.system.JwtTokenUtil;
 
@@ -49,6 +50,9 @@ public class AuthController {
     @Value("${wnt.kafka.internal.producer.topic.login}")
     private String producerTopic;
 
+    @Autowired
+    private RedisListService redisListService;
+
     @PostMapping(value = "/login")
     public ResponseEntity<JwtResponse> authenticate(
             @RequestBody @Valid JwtRequest jwtRequest) {
@@ -66,9 +70,13 @@ public class AuthController {
             // Set thông tin authentication vào Security Context
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
+
             // Trả về jwt cho người dùng.
             String token = jwtTokenUtil.generateToken(jwtRequest.getUsername());
             String refreshToken = jwtTokenUtil.generateRefreshToken(jwtRequest.getUsername());
+
+            redisListService.addValueToListEnd(jwtRequest.getUsername(), token);
+
             return ResponseEntity.ok(new JwtResponse(token, refreshToken));
         } catch (Exception ex) {
             log.error("Authentication error", ex);
@@ -77,7 +85,7 @@ public class AuthController {
     }
 
     @PutMapping(value = "/choose-nha-thuocs")
-    public void chooseNhaThuocs(
+    public ResponseEntity<Profile> chooseNhaThuocs(
             @RequestBody @Valid ChooseNhaThuocs chooseNhaThuocs, Authentication authentication, HttpServletRequest request) {
         String requestTokenHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
@@ -86,28 +94,30 @@ public class AuthController {
             if (requestAttributes != null) {
                 requestAttributes.setAttribute("chooseNhaThuocs", chooseNhaThuocs, RequestAttributes.SCOPE_REQUEST);
             }
-            userService.chooseNhaThuocs(jwtToken);
+            Profile profile = (Profile) authentication.getPrincipal();
+            return ResponseEntity.ok(userService.chooseNhaThuocs(jwtToken, profile.getUsername()).get());
         }
+        return null;
     }
 
     @GetMapping("/profile")
     public ResponseEntity<Profile> getUserDetails(Authentication authentication) {
-        final Profile userDetails = (Profile) authentication.getPrincipal();
-        return ResponseEntity.ok(userDetails);
+        Profile profile = (Profile) authentication.getPrincipal();
+        return ResponseEntity.ok(profile);
     }
 
     @GetMapping("/refresh-token")
     public ResponseEntity<JwtResponse> refreshToken(HttpServletRequest request) {
         String requestTokenHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String jwtToken;
+        String refreshToken;
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7);
+            refreshToken = requestTokenHeader.substring(7);
             try {
-                Claims claims = jwtTokenUtil.getAllClaimsFromToken(jwtToken);
+                Claims claims = jwtTokenUtil.getAllClaimsFromToken(refreshToken);
                 String type = (String) claims.get("type");
-                String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+                String username = jwtTokenUtil.getUsernameFromToken(refreshToken);
                 if ("refreshtoken".equals(type)) {
-                    String refreshToken = jwtTokenUtil.generateRefreshToken(username);
+                    String jwtToken = jwtTokenUtil.generateToken(username);
                     return ResponseEntity.ok(new JwtResponse(jwtToken, refreshToken));
                 }
             } catch (IllegalArgumentException e) {

@@ -58,7 +58,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     .map(Authentication::getName);
 
             if (!loggedUsernameOpt.isPresent() || !loggedUsernameOpt.get().equals(username)) {
-                Optional<Profile> opt = userService.findUserByUsername(username);
+                Optional<Profile> opt = userService.findUserByToken(jwtToken, username);
 
                 if (opt.isPresent()) {
                     // if token is valid configure Spring Security to manually set authentication

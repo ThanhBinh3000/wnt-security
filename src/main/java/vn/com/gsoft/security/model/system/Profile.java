@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import vn.com.gsoft.security.entity.NhaThuocs;
 import vn.com.gsoft.security.entity.Role;
@@ -22,7 +21,7 @@ public class Profile implements UserDetails, Serializable {
     private static final Log logger = LogFactory.getLog(Profile.class);
     private String password;
     private String username;
-    private Set<SimpleGrantedAuthority> authorities;
+    private Set<CodeGrantedAuthority> authorities;
     private boolean accountNonExpired;
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
@@ -39,7 +38,7 @@ public class Profile implements UserDetails, Serializable {
     private List<NhaThuocs> nhaThuocs;
 
 
-    public Profile(Long id, String fullName, NhaThuocs nhaThuoc, List<Role> roles, List<NhaThuocs> nhaThuocs, String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Set<SimpleGrantedAuthority> authorities) {
+    public Profile(Long id, String fullName, NhaThuocs nhaThuoc, List<Role> roles, List<NhaThuocs> nhaThuocs, String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Set<CodeGrantedAuthority> authorities) {
         this.id = id;
         this.fullName = fullName;
         this.nhaThuoc = nhaThuoc;

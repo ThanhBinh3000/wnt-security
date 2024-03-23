@@ -27,6 +27,6 @@ public class Role {
     @Column(name = "Description")
     private String description;
     @Column(name = "Type")
-    private Integer type;
+    private Integer type;  // 0 mặc định, 1 của nhà thuốc
 }
 

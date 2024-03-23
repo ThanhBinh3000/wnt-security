@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,15 +18,21 @@ import vn.com.gsoft.security.entity.Privilege;
 import vn.com.gsoft.security.entity.Role;
 import vn.com.gsoft.security.entity.UserProfile;
 import vn.com.gsoft.security.model.dto.ChooseNhaThuocs;
+import vn.com.gsoft.security.model.system.CodeGrantedAuthority;
 import vn.com.gsoft.security.model.system.Profile;
 import vn.com.gsoft.security.repository.NhaThuocsRepository;
 import vn.com.gsoft.security.repository.PrivilegeRepository;
 import vn.com.gsoft.security.repository.RoleRepository;
 import vn.com.gsoft.security.repository.UserProfileRepository;
+import vn.com.gsoft.security.service.RedisListService;
+import vn.com.gsoft.security.service.UserCacheService;
 import vn.com.gsoft.security.service.UserService;
 import vn.com.gsoft.security.util.system.JwtTokenUtil;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,22 +48,24 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
     private RoleRepository roleRepository;
     @Autowired
     private PrivilegeRepository privilegeRepository;
+    @Autowired
+    private RedisListService redisListService;
 
     @Override
-    public Optional<Profile> findUserByToken(String token) {
-        String username = jwtTokenUtil.getUsernameFromToken(token);
+    @Cacheable(value = CachingConstant.USER_TOKEN, key = "#token+ '-' +#username")
+    public Optional<Profile> findUserByToken(String token, String username) {
+        redisListService.addValueToListEnd(username, token);
         return findUserByUsername(username);
     }
 
     @Override
-    @Cacheable(value = CachingConstant.USER)
     public Optional<Profile> findUserByUsername(String username) {
         log.warn("Cache findUserByUsername missing: {}", username);
         Optional<UserProfile> user = userProfileRepository.findByUserName(username);
         if (!user.isPresent()) {
             throw new BadCredentialsException("Không tìm thấy username!");
         }
-        Set<SimpleGrantedAuthority> privileges = new HashSet<>();
+        Set<CodeGrantedAuthority> privileges = new HashSet<>();
         List<NhaThuocs> nhaThuocs = nhaThuocsRepository.findByMaNhaThuoc(user.get().getMaNhaThuoc());
         return Optional.of(new Profile(
                 user.get().getUserId(),
@@ -76,49 +84,61 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
     }
 
     @Override
-    @CachePut(value = CachingConstant.USER)
-    public Optional<Profile> chooseNhaThuocs(String token) {
+    public Optional<Profile> findByUserNameWhenChoose(String username) {
+        log.warn("Cache findByUserNameWhenChoose missing: {}", username);
+        Optional<UserProfile> user = userProfileRepository.findByUserName(username);
+        if (!user.isPresent()) {
+            throw new BadCredentialsException("Không tìm thấy username!");
+        }
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        ChooseNhaThuocs chooseNhaThuocs = (ChooseNhaThuocs) requestAttributes.getAttribute("chooseNhaThuocs", RequestAttributes.SCOPE_REQUEST);
+        Set<CodeGrantedAuthority> privileges = new HashSet<>();
+        List<NhaThuocs> nhaThuocs = nhaThuocsRepository.findByMaNhaThuoc(user.get().getMaNhaThuoc());
+        Optional<NhaThuocs> nhaThuoc = nhaThuocsRepository.findById(chooseNhaThuocs.getId());
+        List<Role> roles = roleRepository.findByUserIdAndMaNhaThuoc(user.get().getUserId(), nhaThuoc.get().getMaNhaThuoc());
+        List<Long> roleIds = roles.stream()
+                .map(Role::getRoleId) // Extract the ID from each role
+                .collect(Collectors.toList());
+        List<Privilege> privilegeObjs = privilegeRepository.findByRoleIdInAndMaNhaThuocAndEntityId(roleIds, nhaThuoc.get().getMaNhaThuoc(), user.get().getEntityId());
+        for (Privilege p : privilegeObjs) {
+            privileges.add(new CodeGrantedAuthority(p.getCode()));
+        }
+        return Optional.of(new Profile(
+                user.get().getUserId(),
+                user.get().getTenDayDu(),
+                nhaThuoc.get(),
+                roles,
+                nhaThuocs,
+                user.get().getUserName(),
+                user.get().getPassword(),
+                user.get().getHoatDong() && (user.get().getEnableNT() != null ? user.get().getEnableNT() : true),
+                true,
+                true,
+                true,
+                privileges
+        ));
+    }
+
+    @Override
+    public Optional<Profile> getUserNameWhenChoose(String username) {
+        return Optional.empty();
+    }
+
+    @Override
+    @CachePut(value = CachingConstant.USER_TOKEN, key = "#token+ '-' +#username")
+    public Optional<Profile> chooseNhaThuocs(String token, String username) {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null) {
             ChooseNhaThuocs chooseNhaThuocs = (ChooseNhaThuocs) requestAttributes.getAttribute("chooseNhaThuocs", RequestAttributes.SCOPE_REQUEST);
             if (chooseNhaThuocs != null) {
-                String username = jwtTokenUtil.getUsernameFromToken(token);
-                Optional<UserProfile> user = userProfileRepository.findByUserName(username);
-                if (!user.isPresent()) {
-                    throw new BadCredentialsException("Không tìm thấy username!");
-                }
-                Set<SimpleGrantedAuthority> privileges = new HashSet<>();
-                List<NhaThuocs> nhaThuocs = nhaThuocsRepository.findByMaNhaThuoc(user.get().getMaNhaThuoc());
-                Optional<NhaThuocs> nhaThuoc = nhaThuocsRepository.findById(chooseNhaThuocs.getId());
-                List<Role> roles = roleRepository.findByUserIdAndMaNhaThuoc(user.get().getUserId(), nhaThuoc.get().getMaNhaThuoc());
-                List<Long> roleIds = roles.stream()
-                        .map(Role::getRoleId) // Extract the ID from each role
-                        .collect(Collectors.toList());
-                List<Privilege> privilegeObjs = privilegeRepository.findByRoleIdInAndMaNhaThuocAndEntityId(roleIds, nhaThuoc.get().getMaNhaThuoc(), user.get().getEntityId());
-                for(Privilege p : privilegeObjs){
-                    privileges.add(new SimpleGrantedAuthority(p.getCode()));
-                }
-                return Optional.of(new Profile(
-                        user.get().getUserId(),
-                        user.get().getTenDayDu(),
-                        nhaThuoc.get(),
-                        roles,
-                        nhaThuocs,
-                        user.get().getUserName(),
-                        user.get().getPassword(),
-                        user.get().getHoatDong() && (user.get().getEnableNT() != null ? user.get().getEnableNT() : true),
-                        true,
-                        true,
-                        true,
-                        privileges
-                ));
+                redisListService.addValueToListEnd(username, token);
+                return findByUserNameWhenChoose(username);
             }
         }
         return Optional.ofNullable(null);
     }
 
     @Override
-    @Cacheable(value = CachingConstant.USER)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return findUserByUsername(username).get();
     }
