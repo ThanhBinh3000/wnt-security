@@ -31,31 +31,31 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> resourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
-        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false));
+        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false),1);
         return new ResponseEntity<>(errorDetail, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(EntityValidationException.class)
     public ResponseEntity<?> entityValidationException(EntityValidationException ex, WebRequest request) {
-        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), ex.getDetails(), request.getDescription(false));
+        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), ex.getDetails(), request.getDescription(false),1);
         return new ResponseEntity<>(errorDetail, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(QueryValidationException.class)
     public ResponseEntity<?> queryValidationException(QueryValidationException ex, WebRequest request) {
-        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false));
+        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false),1);
         return new ResponseEntity<>(errorDetail, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(PartialUpdateException.class)
     public ResponseEntity<?> partialUpdateException(PartialUpdateException ex, WebRequest request) {
-        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false));
+        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false),1);
         return new ResponseEntity<>(errorDetail, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> illegalArgumentException(IllegalArgumentException ex, WebRequest request) {
-        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false));
+        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false),1);
         return new ResponseEntity<>(errorDetail, HttpStatus.BAD_REQUEST);
     }
 
@@ -64,25 +64,25 @@ public class GlobalExceptionHandler {
         ErrorDetail errorDetail = new ErrorDetail(new Date(),
                 "Error",
                 "",
-                request.getDescription(false));
+                request.getDescription(false),1);
         return new ResponseEntity<>(errorDetail, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<?> authenticationException(AuthenticationException ex, WebRequest request) {
-        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false));
+        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false),1);
         return new ResponseEntity<>(errorDetail, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> accessDeniedException(AccessDeniedException ex, WebRequest request) {
-        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false));
+        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false),1);
         return new ResponseEntity<>(errorDetail, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
-        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false));
+        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false),1);
         Map<String, String> errors = new HashMap<>();
 
         ex.getBindingResult().getAllErrors().forEach((error) -> {
@@ -102,7 +102,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> globalExceptionHandler(Exception ex, WebRequest request) {
         log.error("globalExceptionHandler", ex);
-        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false));
+        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false),1);
         return new ResponseEntity<>(errorDetail, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
