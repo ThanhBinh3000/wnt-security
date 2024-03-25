@@ -22,12 +22,14 @@ import vn.com.gsoft.security.model.dto.ChooseNhaThuocs;
 import vn.com.gsoft.security.model.dto.JwtRequest;
 import vn.com.gsoft.security.model.dto.JwtResponse;
 import vn.com.gsoft.security.model.dto.LoginQr;
+import vn.com.gsoft.security.model.system.BaseResponse;
 import vn.com.gsoft.security.model.system.MessageDTO;
 import vn.com.gsoft.security.model.system.Profile;
 import vn.com.gsoft.security.service.KafkaProducer;
 import vn.com.gsoft.security.service.RedisListService;
 import vn.com.gsoft.security.service.UserService;
 import vn.com.gsoft.security.util.system.JwtTokenUtil;
+import vn.com.gsoft.security.util.system.ResponseUtils;
 
 import java.util.UUID;
 
@@ -54,7 +56,7 @@ public class AuthController {
     private RedisListService redisListService;
 
     @PostMapping(value = "/login")
-    public ResponseEntity<JwtResponse> authenticate(
+    public ResponseEntity<BaseResponse> authenticate(
             @RequestBody @Valid JwtRequest jwtRequest) {
 
         try {
@@ -77,7 +79,7 @@ public class AuthController {
 
             redisListService.addValueToListEnd(jwtRequest.getUsername(), token);
 
-            return ResponseEntity.ok(new JwtResponse(token, refreshToken));
+            return ResponseEntity.ok(ResponseUtils.ok(new JwtResponse(token, refreshToken)));
         } catch (Exception ex) {
             log.error("Authentication error", ex);
             throw new BadCredentialsException("Username or password wrong!");
@@ -85,8 +87,8 @@ public class AuthController {
     }
 
     @PutMapping(value = "/choose-nha-thuocs")
-    public ResponseEntity<Profile> chooseNhaThuocs(
-            @RequestBody @Valid ChooseNhaThuocs chooseNhaThuocs, Authentication authentication, HttpServletRequest request) {
+    public ResponseEntity<BaseResponse> chooseNhaThuocs(
+            @RequestBody @Valid ChooseNhaThuocs chooseNhaThuocs, Authentication authentication, HttpServletRequest request) throws Exception {
         String requestTokenHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             String jwtToken = requestTokenHeader.substring(7);
@@ -95,19 +97,19 @@ public class AuthController {
                 requestAttributes.setAttribute("chooseNhaThuocs", chooseNhaThuocs, RequestAttributes.SCOPE_REQUEST);
             }
             Profile profile = (Profile) authentication.getPrincipal();
-            return ResponseEntity.ok(userService.chooseNhaThuocs(jwtToken, profile.getUsername()).get());
+            return ResponseEntity.ok(ResponseUtils.ok(userService.chooseNhaThuocs(jwtToken, profile.getUsername()).get()));
         }
-        return null;
+        throw new Exception("Lỗi xác thực!");
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<Profile> getUserDetails(Authentication authentication) {
+    public ResponseEntity<BaseResponse> getUserDetails(Authentication authentication) {
         Profile profile = (Profile) authentication.getPrincipal();
-        return ResponseEntity.ok(profile);
+        return ResponseEntity.ok(ResponseUtils.ok(profile));
     }
 
     @GetMapping("/refresh-token")
-    public ResponseEntity<JwtResponse> refreshToken(HttpServletRequest request) {
+    public ResponseEntity<BaseResponse> refreshToken(HttpServletRequest request) {
         String requestTokenHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         String refreshToken;
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
@@ -118,7 +120,7 @@ public class AuthController {
                 String username = jwtTokenUtil.getUsernameFromToken(refreshToken);
                 if ("refreshtoken".equals(type)) {
                     String jwtToken = jwtTokenUtil.generateToken(username);
-                    return ResponseEntity.ok(new JwtResponse(jwtToken, refreshToken));
+                    return ResponseEntity.ok(ResponseUtils.ok(new JwtResponse(jwtToken, refreshToken)));
                 }
             } catch (IllegalArgumentException e) {
                 log.error("Unable to get JWT Token");
@@ -130,7 +132,7 @@ public class AuthController {
     }
 
     @PostMapping(value = "/login-qr")
-    public ResponseEntity<String> authenticateQr(@RequestBody @Valid LoginQr loginQr) {
+    public ResponseEntity<BaseResponse> authenticateQr(@RequestBody @Valid LoginQr loginQr) {
         try {
             Profile profile = (Profile) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //            // Trả về jwt cho người dùng.
@@ -144,7 +146,7 @@ public class AuthController {
             message.setData(gson.toJson(new JwtResponse(token, refreshToken)));
             String messageStr = gson.toJson(message);
             kafkaProducer.sendInternal(producerTopic, messageStr);
-            return ResponseEntity.ok("Thành công!");
+            return ResponseEntity.ok(ResponseUtils.ok("Thành công!"));
         } catch (Exception ex) {
             log.error("Authentication error", ex);
             throw new BadCredentialsException("Token invalid!");
