@@ -82,7 +82,7 @@ public class AuthController {
             return ResponseEntity.ok(ResponseUtils.ok(new JwtResponse(token, refreshToken)));
         } catch (Exception ex) {
             log.error("Authentication error", ex);
-            throw new BadCredentialsException("Username or password wrong!");
+            throw new BadCredentialsException("Tên đăng nhập hoặc mật khẩu không chính xác!");
         }
     }
 
