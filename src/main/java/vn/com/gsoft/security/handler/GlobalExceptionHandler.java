@@ -12,12 +12,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import vn.com.gsoft.security.exception.EntityValidationException;
 import vn.com.gsoft.security.exception.PartialUpdateException;
 import vn.com.gsoft.security.exception.QueryValidationException;
 import vn.com.gsoft.security.exception.ResourceNotFoundException;
 import vn.com.gsoft.security.model.system.ErrorDetail;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +29,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> resourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
+        ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false), HttpStatus.NOT_FOUND.value());
+        return new ResponseEntity<>(errorDetail, HttpStatus.OK);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<?> noResourceFoundException(NoResourceFoundException ex, WebRequest request) {
         ErrorDetail errorDetail = new ErrorDetail(new Date(), ex.getMessage(), "", request.getDescription(false), HttpStatus.NOT_FOUND.value());
         return new ResponseEntity<>(errorDetail, HttpStatus.OK);
     }
