@@ -18,7 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
-import vn.com.gsoft.security.model.dto.ChooseNhaThuocs;
+import vn.com.gsoft.security.model.dto.ChooseNhaThuoc;
 import vn.com.gsoft.security.model.dto.JwtRequest;
 import vn.com.gsoft.security.model.dto.JwtResponse;
 import vn.com.gsoft.security.model.dto.LoginQr;
@@ -86,18 +86,18 @@ public class AuthController {
         }
     }
 
-    @PutMapping(value = "/choose-nha-thuocs")
-    public ResponseEntity<BaseResponse> chooseNhaThuocs(
-            @RequestBody @Valid ChooseNhaThuocs chooseNhaThuocs, Authentication authentication, HttpServletRequest request) throws Exception {
+    @PutMapping(value = "/choose-nha-thuoc")
+    public ResponseEntity<BaseResponse> chooseNhaThuoc(
+            @RequestBody @Valid ChooseNhaThuoc chooseNhaThuoc, Authentication authentication, HttpServletRequest request) throws Exception {
         String requestTokenHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             String jwtToken = requestTokenHeader.substring(7);
             RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
             if (requestAttributes != null) {
-                requestAttributes.setAttribute("chooseNhaThuocs", chooseNhaThuocs, RequestAttributes.SCOPE_REQUEST);
+                requestAttributes.setAttribute("chooseNhaThuoc", chooseNhaThuoc, RequestAttributes.SCOPE_REQUEST);
             }
             Profile profile = (Profile) authentication.getPrincipal();
-            return ResponseEntity.ok(ResponseUtils.ok(userService.chooseNhaThuocs(jwtToken, profile.getUsername()).get()));
+            return ResponseEntity.ok(ResponseUtils.ok(userService.chooseNhaThuoc(jwtToken, profile.getUsername()).get()));
         }
         throw new Exception("Lỗi xác thực!");
     }

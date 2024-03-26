@@ -5,6 +5,6 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class ChooseNhaThuocs implements Serializable {
+public class ChooseNhaThuoc implements Serializable {
     private Long id;
 }

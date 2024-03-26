@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,7 +16,7 @@ import vn.com.gsoft.security.entity.NhaThuocs;
 import vn.com.gsoft.security.entity.Privilege;
 import vn.com.gsoft.security.entity.Role;
 import vn.com.gsoft.security.entity.UserProfile;
-import vn.com.gsoft.security.model.dto.ChooseNhaThuocs;
+import vn.com.gsoft.security.model.dto.ChooseNhaThuoc;
 import vn.com.gsoft.security.model.system.CodeGrantedAuthority;
 import vn.com.gsoft.security.model.system.Profile;
 import vn.com.gsoft.security.repository.NhaThuocsRepository;
@@ -25,7 +24,6 @@ import vn.com.gsoft.security.repository.PrivilegeRepository;
 import vn.com.gsoft.security.repository.RoleRepository;
 import vn.com.gsoft.security.repository.UserProfileRepository;
 import vn.com.gsoft.security.service.RedisListService;
-import vn.com.gsoft.security.service.UserCacheService;
 import vn.com.gsoft.security.service.UserService;
 import vn.com.gsoft.security.util.system.JwtTokenUtil;
 
@@ -91,10 +89,10 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
             throw new BadCredentialsException("Không tìm thấy username!");
         }
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        ChooseNhaThuocs chooseNhaThuocs = (ChooseNhaThuocs) requestAttributes.getAttribute("chooseNhaThuocs", RequestAttributes.SCOPE_REQUEST);
+        ChooseNhaThuoc chooseNhaThuoc = (ChooseNhaThuoc) requestAttributes.getAttribute("chooseNhaThuoc", RequestAttributes.SCOPE_REQUEST);
         Set<CodeGrantedAuthority> privileges = new HashSet<>();
         List<NhaThuocs> nhaThuocs = nhaThuocsRepository.findByMaNhaThuoc(user.get().getMaNhaThuoc());
-        Optional<NhaThuocs> nhaThuoc = nhaThuocsRepository.findById(chooseNhaThuocs.getId());
+        Optional<NhaThuocs> nhaThuoc = nhaThuocsRepository.findById(chooseNhaThuoc.getId());
         List<Role> roles = roleRepository.findByUserIdAndMaNhaThuoc(user.get().getUserId(), nhaThuoc.get().getMaNhaThuoc());
         List<Long> roleIds = roles.stream()
                 .map(Role::getRoleId) // Extract the ID from each role
@@ -126,11 +124,11 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
 
     @Override
     @CachePut(value = CachingConstant.USER_TOKEN, key = "#token+ '-' +#username")
-    public Optional<Profile> chooseNhaThuocs(String token, String username) {
+    public Optional<Profile> chooseNhaThuoc(String token, String username) {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null) {
-            ChooseNhaThuocs chooseNhaThuocs = (ChooseNhaThuocs) requestAttributes.getAttribute("chooseNhaThuocs", RequestAttributes.SCOPE_REQUEST);
-            if (chooseNhaThuocs != null) {
+            ChooseNhaThuoc chooseNhaThuoc = (ChooseNhaThuoc) requestAttributes.getAttribute("chooseNhaThuoc", RequestAttributes.SCOPE_REQUEST);
+            if (chooseNhaThuoc != null) {
                 redisListService.addValueToListEnd(username, token);
                 return findByUserNameWhenChoose(username);
             }
