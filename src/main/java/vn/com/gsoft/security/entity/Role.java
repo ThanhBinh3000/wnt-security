@@ -14,10 +14,10 @@ import jakarta.persistence.Entity;
 @AllArgsConstructor
 @Entity
 @Table(name = "Role")
-public class Role {
+public class Role extends BaseEntity{
     @Id
-    @Column(name = "RoleId")
-    private Long roleId;
+    @Column(name = "id")
+    private Long id;
     @Column(name = "RoleName")
     private String roleName;
     @Column(name = "IsDeleted")

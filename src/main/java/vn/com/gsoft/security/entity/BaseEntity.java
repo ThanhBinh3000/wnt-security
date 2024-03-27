@@ -1,5 +1,6 @@
 package vn.com.gsoft.security.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
@@ -20,11 +21,18 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class BaseEntity {
     @CreatedDate
-    private LocalDateTime createAt;
+    @Column(name="Created")
+    private LocalDateTime created;
+
     @CreatedBy
-    private Long createById;
+    @Column(name="CreatedBy_UserId")
+    private Long createdByUserId;
+
     @LastModifiedDate
-    private LocalDateTime updateAt;
+    @Column(name="Modified")
+    private LocalDateTime modified;
+
     @LastModifiedBy
-    private Long updateById;
+    @Column(name="ModifiedBy_UserId")
+    private Long modifiedByUserId;
 }

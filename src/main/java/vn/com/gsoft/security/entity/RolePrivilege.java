@@ -13,7 +13,7 @@ import lombok.*;
 @Builder
 @Entity
 @Table(name = "RolePrivilege")
-public class RolePrivilege {
+public class RolePrivilege extends BaseEntity{
     @Id
     @Column(name = "ID")
     private Long id;

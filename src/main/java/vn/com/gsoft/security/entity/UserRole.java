@@ -14,7 +14,7 @@ import jakarta.persistence.Entity;
 @AllArgsConstructor
 @Entity
 @Table(name = "UserRole")
-public class UserRole {
+public class UserRole extends BaseEntity{
     @Id
     @Column(name = "Id")
     private Integer id;

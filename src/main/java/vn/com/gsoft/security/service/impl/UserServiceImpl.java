@@ -66,7 +66,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
         Set<CodeGrantedAuthority> privileges = new HashSet<>();
         List<NhaThuocs> nhaThuocs = nhaThuocsRepository.findByMaNhaThuoc(user.get().getMaNhaThuoc());
         return Optional.of(new Profile(
-                user.get().getUserId(),
+                user.get().getId(),
                 user.get().getTenDayDu(),
                 null,
                 null,
@@ -93,16 +93,16 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
         Set<CodeGrantedAuthority> privileges = new HashSet<>();
         List<NhaThuocs> nhaThuocs = nhaThuocsRepository.findByMaNhaThuoc(user.get().getMaNhaThuoc());
         Optional<NhaThuocs> nhaThuoc = nhaThuocsRepository.findById(chooseNhaThuoc.getId());
-        List<Role> roles = roleRepository.findByUserIdAndMaNhaThuoc(user.get().getUserId(), nhaThuoc.get().getMaNhaThuoc());
+        List<Role> roles = roleRepository.findByUserIdAndMaNhaThuoc(user.get().getId(), nhaThuoc.get().getMaNhaThuoc());
         List<Long> roleIds = roles.stream()
-                .map(Role::getRoleId) // Extract the ID from each role
+                .map(Role::getId) // Extract the ID from each role
                 .collect(Collectors.toList());
         List<Privilege> privilegeObjs = privilegeRepository.findByRoleIdInAndMaNhaThuocAndEntityId(roleIds, nhaThuoc.get().getMaNhaThuoc(), user.get().getEntityId());
         for (Privilege p : privilegeObjs) {
             privileges.add(new CodeGrantedAuthority(p.getCode()));
         }
         return Optional.of(new Profile(
-                user.get().getUserId(),
+                user.get().getId(),
                 user.get().getTenDayDu(),
                 nhaThuoc.get(),
                 roles,

@@ -15,10 +15,10 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Entity
 @Table(name = "UserProfile")
-public class UserProfile implements Serializable {
+public class UserProfile extends BaseEntity implements Serializable {
     @Id
-    @Column(name = "UserId")
-    private Long userId;
+    @Column(name = "id")
+    private Long id;
     @Column(name = "UserName")
     private String userName;
     @Column(name = "Password")

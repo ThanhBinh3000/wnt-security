@@ -17,7 +17,10 @@ import java.util.Date;
 @AllArgsConstructor
 @Entity
 @Table(name = "NhaThuocs")
-public class NhaThuocs {
+public class NhaThuocs extends BaseEntity{
+    @Id
+    @Column(name = "ID")
+    private Long id;
     @Column(name = "MaNhaThuoc")
     private String maNhaThuoc;
     @Column(name = "TenNhaThuoc")
@@ -36,14 +39,6 @@ public class NhaThuocs {
     private String mobile;
     @Column(name = "DuocSy")
     private String duocSy;
-    @Column(name = "Created")
-    private Date created;
-    @Column(name = "Modified")
-    private Date modified;
-    @Column(name = "CreatedBy_UserId")
-    private Integer createdByUserId;
-    @Column(name = "ModifiedBy_UserId")
-    private Integer modifiedByUserId;
     @Column(name = "HoatDong")
     private Boolean hoatDong;
     @Column(name = "Active")
@@ -54,9 +49,6 @@ public class NhaThuocs {
     private Integer tinhThanhId;
     @Column(name = "MaNhaThuocCha")
     private String maNhaThuocCha;
-    @Id
-    @Column(name = "ID")
-    private Integer id;
     @Column(name = "IsConnectivity")
     private Boolean isConnectivity;
     @Column(name = "ConnectivityCode")
