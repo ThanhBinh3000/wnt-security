@@ -12,7 +12,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 public class BaseEntity {
     @CreatedDate
     @Column(name="Created")
-    private LocalDateTime created;
+    private Date created;
 
     @CreatedBy
     @Column(name="CreatedBy_UserId")
@@ -30,7 +30,7 @@ public class BaseEntity {
 
     @LastModifiedDate
     @Column(name="Modified")
-    private LocalDateTime modified;
+    private Date modified;
 
     @LastModifiedBy
     @Column(name="ModifiedBy_UserId")
