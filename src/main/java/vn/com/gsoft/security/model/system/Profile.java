@@ -1,5 +1,6 @@
 package vn.com.gsoft.security.model.system;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import java.util.Set;
 public class Profile implements UserDetails, Serializable {
     private static final long serialVersionUID = 620L;
     private static final Log logger = LogFactory.getLog(Profile.class);
+    @JsonIgnore
     private String password;
     private String username;
     private Set<CodeGrantedAuthority> authorities;
