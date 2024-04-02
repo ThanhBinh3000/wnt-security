@@ -46,7 +46,7 @@ public class NhaThuocs extends BaseEntity{
     @Column(name = "IsReportDataGenerating")
     private Boolean isReportDataGenerating;
     @Column(name = "TinhThanhId")
-    private Integer tinhThanhId;
+    private Long tinhThanhId;
     @Column(name = "MaNhaThuocCha")
     private String maNhaThuocCha;
     @Column(name = "IsConnectivity")
@@ -66,17 +66,17 @@ public class NhaThuocs extends BaseEntity{
     @Column(name = "Description")
     private String description;
     @Column(name = "DrugStoreTypeId")
-    private Integer drugStoreTypeId;
+    private Long drugStoreTypeId;
     @Column(name = "IsPaid")
     private Boolean isPaid;
     @Column(name = "ChainLinkId")
-    private Integer chainLinkId;
+    private Long chainLinkId;
     @Column(name = "RegionId")
-    private Integer regionId;
+    private Long regionId;
     @Column(name = "CityId")
-    private Integer cityId;
+    private Long cityId;
     @Column(name = "WardId")
-    private Integer wardId;
+    private Long wardId;
     @Column(name = "LastTransDate")
     private Date lastTransDate;
     @Column(name = "SupportPhones")
@@ -86,7 +86,7 @@ public class NhaThuocs extends BaseEntity{
     @Column(name = "ContentThankYou")
     private String contentThankYou;
     @Column(name = "IdTypeBasic")
-    private Integer idTypeBasic;
+    private Long idTypeBasic;
     @Column(name = "GhiChu")
     private String ghiChu;
     @Column(name = "IsNationalDBConnected")
@@ -96,7 +96,7 @@ public class NhaThuocs extends BaseEntity{
     @Column(name = "ImageThumbUrl")
     private String imageThumbUrl;
     @Column(name = "TotalNumberInvoices")
-    private Integer totalNumberInvoices;
+    private Long totalNumberInvoices;
     @Column(name = "ConnEInvoiceUserName")
     private String connEInvoiceUserName;
     @Column(name = "ConnEInvoicePassword")
@@ -143,7 +143,7 @@ public class NhaThuocs extends BaseEntity{
     @Column(name = "GoogleLocation_CustomerWebsite")
     private String googleLocationCustomerWebsite;
     @Column(name = "ThemeId_CustomerWebsite")
-    private Integer themeIdCustomerWebsite;
+    private Long themeIdCustomerWebsite;
     @Column(name = "TokenZalo")
     private String tokenZalo;
     @Column(name = "ZaloKey")
@@ -184,7 +184,7 @@ public class NhaThuocs extends BaseEntity{
     @Column(name = "ZNS_TrackingIdPayment")
     private String zNSTrackingIdPayment;
     @Column(name = "BusinessId")
-    private Integer businessId;
+    private Long businessId;
     @Column(name = "CodeErrorConfirmPayment_ZNS")
     private Integer codeErrorConfirmPaymentZNS;
     @Column(name = "CodeErrorCreateAccount_ZNS")
@@ -196,7 +196,7 @@ public class NhaThuocs extends BaseEntity{
     @Column(name = "Evaluate")
     private Integer evaluate;
     @Column(name = "SupporterId")
-    private Integer supporterId;
+    private Long supporterId;
     @Column(name = "UpgradeToPlus")
     private Boolean upgradeToPlus;
 }

@@ -38,15 +38,15 @@ public class UserProfile extends BaseEntity implements Serializable {
     @Column(name = "Enable_NT")
     private Boolean enableNT;
     @Column(name = "ArchivedId")
-    private Integer archivedId;
+    private Long archivedId;
     @Column(name = "StoreId")
-    private Integer storeId;
+    private Long storeId;
     @Column(name = "RegionId")
-    private Integer regionId;
+    private Long regionId;
     @Column(name = "CityId")
-    private Integer cityId;
+    private Long cityId;
     @Column(name = "WardId")
-    private Integer wardId;
+    private Long wardId;
     @Column(name = "Addresses")
     private String addresses;
     @Column(name = "TokenDevice")

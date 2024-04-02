@@ -17,10 +17,10 @@ import jakarta.persistence.Entity;
 public class UserRole extends BaseEntity{
     @Id
     @Column(name = "Id")
-    private Integer id;
+    private Long id;
     @Column(name = "UserId")
-    private Integer userId;
+    private Long userId;
     @Column(name = "RoleId")
-    private Integer roleId;
+    private Long roleId;
 }
 

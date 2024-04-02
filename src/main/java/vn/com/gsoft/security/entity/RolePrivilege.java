@@ -19,7 +19,7 @@ public class RolePrivilege extends BaseEntity{
     private Long id;
 
     @Column(name = "RoleId")
-    private Integer roleId;
+    private Long roleId;
 
     @Column(name = "PrivilegeId")
     private Long privilegeId;
