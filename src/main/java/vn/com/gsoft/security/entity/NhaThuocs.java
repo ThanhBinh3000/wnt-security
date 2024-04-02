@@ -85,8 +85,6 @@ public class NhaThuocs extends BaseEntity{
     private String deliveryPolicy;
     @Column(name = "ContentThankYou")
     private String contentThankYou;
-    @Column(name = "RecordStatusId")
-    private Integer recordStatusId;
     @Column(name = "IdTypeBasic")
     private Integer idTypeBasic;
     @Column(name = "GhiChu")

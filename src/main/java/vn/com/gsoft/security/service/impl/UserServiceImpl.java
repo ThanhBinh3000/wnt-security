@@ -52,24 +52,37 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
     @Override
     @Cacheable(value = CachingConstant.USER_TOKEN, key = "#token+ '-' +#username")
     public Optional<Profile> findUserByToken(String token, String username) {
+        log.warn("Cache findUserByToken missing: {}", username);
         redisListService.addValueToListEnd(username, token);
         return findUserByUsername(username);
     }
 
     @Override
     public Optional<Profile> findUserByUsername(String username) {
-        log.warn("Cache findUserByUsername missing: {}", username);
         Optional<UserProfile> user = userProfileRepository.findByUserName(username);
         if (!user.isPresent()) {
             throw new BadCredentialsException("Không tìm thấy username!");
         }
         Set<CodeGrantedAuthority> privileges = new HashSet<>();
-        List<NhaThuocs> nhaThuocs = nhaThuocsRepository.findByMaNhaThuoc(user.get().getMaNhaThuoc());
+        List<NhaThuocs> nhaThuocs = nhaThuocsRepository.findByUserId(user.get().getId());
+        NhaThuocs nhaThuoc = null;
+        List<Role> roles = null;
+        if (nhaThuocs.size() == 1) {
+            nhaThuoc = nhaThuocs.get(0);
+            roles = roleRepository.findByUserIdAndMaNhaThuoc(user.get().getId(), nhaThuoc.getMaNhaThuoc());
+            List<Long> roleIds = roles.stream()
+                    .map(Role::getId) // Extract the ID from each role
+                    .collect(Collectors.toList());
+            List<Privilege> privilegeObjs = privilegeRepository.findByRoleIdInAndMaNhaThuocAndEntityId(roleIds, nhaThuoc.getMaNhaThuoc(), user.get().getEntityId());
+            for (Privilege p : privilegeObjs) {
+                privileges.add(new CodeGrantedAuthority(p.getCode()));
+            }
+        }
         return Optional.of(new Profile(
                 user.get().getId(),
                 user.get().getTenDayDu(),
-                null,
-                null,
+                nhaThuoc,
+                roles,
                 nhaThuocs,
                 user.get().getUserName(),
                 user.get().getPassword(),
@@ -83,7 +96,6 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
 
     @Override
     public Optional<Profile> findByUserNameWhenChoose(String username) {
-        log.warn("Cache findByUserNameWhenChoose missing: {}", username);
         Optional<UserProfile> user = userProfileRepository.findByUserName(username);
         if (!user.isPresent()) {
             throw new BadCredentialsException("Không tìm thấy username!");

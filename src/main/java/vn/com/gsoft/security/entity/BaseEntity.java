@@ -35,4 +35,7 @@ public class BaseEntity {
     @LastModifiedBy
     @Column(name="ModifiedBy_UserId")
     private Long modifiedByUserId;
+
+    @Column(name="RecordStatusId")
+    private Long recordStatusId;
 }
