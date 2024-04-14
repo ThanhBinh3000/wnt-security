@@ -17,6 +17,8 @@ import vn.com.gsoft.security.entity.Privilege;
 import vn.com.gsoft.security.entity.Role;
 import vn.com.gsoft.security.entity.UserProfile;
 import vn.com.gsoft.security.model.dto.ChooseNhaThuoc;
+import vn.com.gsoft.security.model.dto.NhaThuocsReq;
+import vn.com.gsoft.security.model.dto.NhaThuocsRes;
 import vn.com.gsoft.security.model.system.CodeGrantedAuthority;
 import vn.com.gsoft.security.model.system.Profile;
 import vn.com.gsoft.security.repository.NhaThuocsRepository;
@@ -25,6 +27,7 @@ import vn.com.gsoft.security.repository.RoleRepository;
 import vn.com.gsoft.security.repository.UserProfileRepository;
 import vn.com.gsoft.security.service.RedisListService;
 import vn.com.gsoft.security.service.UserService;
+import vn.com.gsoft.security.util.system.DataUtils;
 import vn.com.gsoft.security.util.system.JwtTokenUtil;
 
 import java.util.HashSet;
@@ -69,6 +72,11 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
         List<Role> roles = null;
         if (nhaThuocs.size() == 1) {
             nhaThuoc = nhaThuocs.get(0);
+            NhaThuocsReq req = new NhaThuocsReq();
+            req.setMaNhaThuoc(nhaThuoc.getMaNhaThuoc());
+            req.setUserIdQueryData(user.get().getId());
+            NhaThuocsRes nhaThuocsRes = DataUtils.convertOne(nhaThuocsRepository.getUserRoleNhaThuoc(req), NhaThuocsRes.class);
+            nhaThuoc.setRole(nhaThuocsRes.getRole());
             roles = roleRepository.findByUserIdAndMaNhaThuoc(user.get().getId(), nhaThuoc.getMaNhaThuoc());
             List<Long> roleIds = roles.stream()
                     .map(Role::getId) // Extract the ID from each role
@@ -105,6 +113,11 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
         Set<CodeGrantedAuthority> privileges = new HashSet<>();
         List<NhaThuocs> nhaThuocs = nhaThuocsRepository.findByMaNhaThuoc(user.get().getMaNhaThuoc());
         Optional<NhaThuocs> nhaThuoc = nhaThuocsRepository.findById(chooseNhaThuoc.getId());
+        NhaThuocsReq req = new NhaThuocsReq();
+        req.setMaNhaThuoc(nhaThuoc.get().getMaNhaThuoc());
+        req.setUserIdQueryData(user.get().getId());
+        NhaThuocsRes nhaThuocsRes = DataUtils.convertOne(nhaThuocsRepository.getUserRoleNhaThuoc(req), NhaThuocsRes.class);
+        nhaThuoc.get().setRole(nhaThuocsRes.getRole());
         List<Role> roles = roleRepository.findByUserIdAndMaNhaThuoc(user.get().getId(), nhaThuoc.get().getMaNhaThuoc());
         List<Long> roleIds = roles.stream()
                 .map(Role::getId) // Extract the ID from each role
