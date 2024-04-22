@@ -7,8 +7,10 @@ import lombok.Setter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.security.core.userdetails.UserDetails;
+import vn.com.gsoft.security.entity.ApplicationSetting;
 import vn.com.gsoft.security.entity.NhaThuocs;
 import vn.com.gsoft.security.entity.Role;
+import vn.com.gsoft.security.entity.Settings;
 
 import java.io.Serializable;
 import java.util.List;
@@ -38,9 +40,15 @@ public class Profile implements UserDetails, Serializable {
     private List<Role> roles;
 
     private List<NhaThuocs> nhaThuocs;
+    private List<Settings> settings;
+    private List<ApplicationSetting> applicationSettings;
 
 
-    public Profile(Long id, String fullName, NhaThuocs nhaThuoc, List<Role> roles, List<NhaThuocs> nhaThuocs, String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Set<CodeGrantedAuthority> authorities) {
+    public Profile(Long id, String fullName, NhaThuocs nhaThuoc, List<Role> roles, List<NhaThuocs> nhaThuocs,
+                   String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Set<CodeGrantedAuthority> authorities,
+                   List<Settings> settings,
+                   List<ApplicationSetting> applicationSettings
+    ) {
         this.id = id;
         this.fullName = fullName;
         this.nhaThuoc = nhaThuoc;
@@ -53,5 +61,7 @@ public class Profile implements UserDetails, Serializable {
         this.credentialsNonExpired = credentialsNonExpired;
         this.accountNonLocked = accountNonLocked;
         this.authorities = authorities;
+        this.settings = settings;
+        this.applicationSettings = applicationSettings;
     }
 }

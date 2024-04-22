@@ -12,28 +12,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import vn.com.gsoft.security.constant.CachingConstant;
-import vn.com.gsoft.security.entity.NhaThuocs;
-import vn.com.gsoft.security.entity.Privilege;
-import vn.com.gsoft.security.entity.Role;
-import vn.com.gsoft.security.entity.UserProfile;
+import vn.com.gsoft.security.entity.*;
 import vn.com.gsoft.security.model.dto.ChooseNhaThuoc;
 import vn.com.gsoft.security.model.dto.NhaThuocsReq;
 import vn.com.gsoft.security.model.dto.NhaThuocsRes;
 import vn.com.gsoft.security.model.system.CodeGrantedAuthority;
 import vn.com.gsoft.security.model.system.Profile;
-import vn.com.gsoft.security.repository.NhaThuocsRepository;
-import vn.com.gsoft.security.repository.PrivilegeRepository;
-import vn.com.gsoft.security.repository.RoleRepository;
-import vn.com.gsoft.security.repository.UserProfileRepository;
+import vn.com.gsoft.security.repository.*;
 import vn.com.gsoft.security.service.RedisListService;
 import vn.com.gsoft.security.service.UserService;
 import vn.com.gsoft.security.util.system.DataUtils;
 import vn.com.gsoft.security.util.system.JwtTokenUtil;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,6 +42,10 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
     private PrivilegeRepository privilegeRepository;
     @Autowired
     private RedisListService redisListService;
+    @Autowired
+    private SettingsRepository settingsRepository;
+    @Autowired
+    private ApplicationSettingRepository applicationSettingRepository;
 
     @Override
     @Cacheable(value = CachingConstant.USER_TOKEN, key = "#token+ '-' +#username")
@@ -69,9 +64,14 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
         Set<CodeGrantedAuthority> privileges = new HashSet<>();
         List<NhaThuocs> nhaThuocs = nhaThuocsRepository.findByUserId(user.get().getId());
         NhaThuocs nhaThuoc = null;
-        List<Role> roles = null;
+        List<Role> roles = new ArrayList<>();
+        List<Settings> settings = new ArrayList<>();
+        List<ApplicationSetting> applicationSettings = new ArrayList<>();
         if (nhaThuocs.size() == 1) {
             nhaThuoc = nhaThuocs.get(0);
+            settings = settingsRepository.findByMaNhaThuoc(nhaThuoc.getMaNhaThuoc());
+            applicationSettings = applicationSettingRepository.findByDrugStoreId(nhaThuoc.getMaNhaThuoc());
+
             NhaThuocsReq req = new NhaThuocsReq();
             req.setMaNhaThuoc(nhaThuoc.getMaNhaThuoc());
             req.setUserIdQueryData(user.get().getId());
@@ -98,7 +98,9 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
                 true,
                 true,
                 true,
-                privileges
+                privileges,
+                settings,
+                applicationSettings
         ));
     }
 
@@ -118,6 +120,8 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
         req.setUserIdQueryData(user.get().getId());
         NhaThuocsRes nhaThuocsRes = DataUtils.convertOne(nhaThuocsRepository.getUserRoleNhaThuoc(req), NhaThuocsRes.class);
         nhaThuoc.get().setRole(nhaThuocsRes.getRole());
+        List<Settings> settings = settingsRepository.findByMaNhaThuoc(nhaThuoc.get().getMaNhaThuoc());
+        List<ApplicationSetting> applicationSettings = applicationSettingRepository.findByDrugStoreId(nhaThuoc.get().getMaNhaThuoc());
         List<Role> roles = roleRepository.findByUserIdAndMaNhaThuoc(user.get().getId(), nhaThuoc.get().getMaNhaThuoc());
         List<Long> roleIds = roles.stream()
                 .map(Role::getId) // Extract the ID from each role
@@ -138,7 +142,9 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
                 true,
                 true,
                 true,
-                privileges
+                privileges,
+                settings,
+                applicationSettings
         ));
     }
 
