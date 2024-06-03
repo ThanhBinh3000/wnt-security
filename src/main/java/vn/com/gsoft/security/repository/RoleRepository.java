@@ -13,4 +13,9 @@ public interface RoleRepository extends CrudRepository<Role, Long> {
             "join UserRole ur on ur.roleId = r.id  " +
             "where ur.userId = ?1 and (r.type = 0 or r.maNhaThuoc = ?2)")
     List<Role> findByUserIdAndMaNhaThuoc(Long userId, String maNhaThuoc);
+    @Query(value = "SELECT r from Role r " +
+            "join UserRole ur on ur.roleId = r.id  " +
+            "join RoleType rt on rt.roleId = r.id  " +
+            "where rt = 'Hệ thống' and ur.userId = ?1")
+    List<Role> findByUserId(Long id);
 }

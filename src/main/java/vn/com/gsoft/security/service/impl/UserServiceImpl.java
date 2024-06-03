@@ -20,6 +20,7 @@ import vn.com.gsoft.security.model.system.CodeGrantedAuthority;
 import vn.com.gsoft.security.model.system.Profile;
 import vn.com.gsoft.security.repository.*;
 import vn.com.gsoft.security.service.RedisListService;
+import vn.com.gsoft.security.service.RoleService;
 import vn.com.gsoft.security.service.UserService;
 import vn.com.gsoft.security.util.system.DataUtils;
 import vn.com.gsoft.security.util.system.JwtTokenUtil;
@@ -37,7 +38,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
     @Autowired
     private NhaThuocsRepository nhaThuocsRepository;
     @Autowired
-    private RoleRepository roleRepository;
+    private RoleService roleService;
     @Autowired
     private PrivilegeRepository privilegeRepository;
     @Autowired
@@ -77,7 +78,10 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
             req.setUserIdQueryData(user.get().getId());
             NhaThuocsRes nhaThuocsRes = DataUtils.convertOne(nhaThuocsRepository.getUserRoleNhaThuoc(req), NhaThuocsRes.class);
             nhaThuoc.setRole(nhaThuocsRes.getRole());
-            roles = roleRepository.findByUserIdAndMaNhaThuoc(user.get().getId(), nhaThuoc.getMaNhaThuoc());
+            // check user có phải user hệ thống không
+            List<Role> roleHts = roleService.findByUserId(user.get().getId());
+            roles = roleService.findByUserIdAndMaNhaThuoc(user.get().getId(), nhaThuoc.getMaNhaThuoc());
+            roles.addAll(roleHts);
             List<Long> roleIds = roles.stream()
                     .map(Role::getId) // Extract the ID from each role
                     .collect(Collectors.toList());
@@ -122,7 +126,10 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
         nhaThuoc.get().setRole(nhaThuocsRes.getRole());
         List<Settings> settings = settingsRepository.findByMaNhaThuoc(nhaThuoc.get().getMaNhaThuoc());
         List<ApplicationSetting> applicationSettings = applicationSettingRepository.findByDrugStoreId(nhaThuoc.get().getMaNhaThuoc());
-        List<Role> roles = roleRepository.findByUserIdAndMaNhaThuoc(user.get().getId(), nhaThuoc.get().getMaNhaThuoc());
+        // check user có phải user hệ thống không
+        List<Role> roleHts = roleService.findByUserId(user.get().getId());
+        List<Role> roles = roleService.findByUserIdAndMaNhaThuoc(user.get().getId(), nhaThuoc.get().getMaNhaThuoc());
+        roles.addAll(roleHts);
         List<Long> roleIds = roles.stream()
                 .map(Role::getId) // Extract the ID from each role
                 .collect(Collectors.toList());

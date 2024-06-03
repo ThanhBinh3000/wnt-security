@@ -54,6 +54,9 @@ public class DataUtils {
 
     public static <T> T convertOne(Tuple tuple, Class<T> clazz) {
         try {
+            if(tuple ==null){
+                return null;
+            }
             T e = clazz.getDeclaredConstructor().newInstance(); // Sử dụng getDeclaredConstructor().newInstance() để tạo instance
             for (Field field : clazz.getDeclaredFields()) {
                 field.setAccessible(true); // Cho phép truy cập các thuộc tính
