@@ -30,6 +30,7 @@ public class Role extends BaseEntity{
     private Integer type;  // 0 mặc định, 1 của nhà thuốc
     @Column(name = "IsDefault")
     private Boolean isDefault;  // true là mặc định
+    @Transient
     private String roleType;
 }
 
