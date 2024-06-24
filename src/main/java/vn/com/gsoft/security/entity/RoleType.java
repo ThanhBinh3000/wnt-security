@@ -17,8 +17,6 @@ public class RoleType extends BaseEntity {
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "RoleId")
-    private Long roleId;
     @Column(name = "RoleName")
     private String roleName;
     @Column(name = "Descripition")

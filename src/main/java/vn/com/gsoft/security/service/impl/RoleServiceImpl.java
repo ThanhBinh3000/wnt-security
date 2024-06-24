@@ -21,7 +21,7 @@ public class RoleServiceImpl implements RoleService {
     public List<Role> findByUserIdAndMaNhaThuoc(Long id, String maNhaThuoc) {
         List<Role> roles = roleRepository.findByUserIdAndMaNhaThuoc(id, maNhaThuoc);
         for (Role r : roles) {
-            Optional<RoleType> roleId = roleTypeRepository.findByRoleId(r.getId());
+            Optional<RoleType> roleId = roleTypeRepository.findById(r.getId());
             roleId.ifPresent(roleType -> r.setRoleType(roleType.getDescripition()));
         }
         return roles;
@@ -31,7 +31,7 @@ public class RoleServiceImpl implements RoleService {
     public List<Role> findByUserId(Long id) {
         List<Role> roles = roleRepository.findByUserId(id);
         for (Role r : roles) {
-            Optional<RoleType> roleId = roleTypeRepository.findByRoleId(r.getId());
+            Optional<RoleType> roleId = roleTypeRepository.findById(r.getId());
             roleId.ifPresent(roleType -> r.setRoleType(roleType.getDescripition()));
         }
         return roles;
