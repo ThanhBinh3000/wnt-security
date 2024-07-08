@@ -85,7 +85,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
             List<Long> roleIds = roles.stream()
                     .map(Role::getId) // Extract the ID from each role
                     .collect(Collectors.toList());
-            List<Privilege> privilegeObjs = privilegeRepository.findByRoleIdInAndMaNhaThuocAndEntityId(roleIds, nhaThuoc.getMaNhaThuoc(), user.get().getEntityId());
+            List<Privilege> privilegeObjs = privilegeRepository.findByRoleIdInAndEntityId(roleIds);
             for (Privilege p : privilegeObjs) {
                 privileges.add(new CodeGrantedAuthority(p.getCode()));
             }
@@ -133,7 +133,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
         List<Long> roleIds = roles.stream()
                 .map(Role::getId) // Extract the ID from each role
                 .collect(Collectors.toList());
-        List<Privilege> privilegeObjs = privilegeRepository.findByRoleIdInAndMaNhaThuocAndEntityId(roleIds, nhaThuoc.get().getMaNhaThuoc(), user.get().getEntityId());
+        List<Privilege> privilegeObjs = privilegeRepository.findByRoleIdInAndEntityId(roleIds);
         for (Privilege p : privilegeObjs) {
             privileges.add(new CodeGrantedAuthority(p.getCode()));
         }
