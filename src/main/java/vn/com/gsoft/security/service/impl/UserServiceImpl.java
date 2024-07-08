@@ -175,6 +175,16 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
     }
 
     @Override
+    public UserProfile findByUsername(String username) {
+        return userProfileRepository.findByUserName(username).orElse(null);
+    }
+
+    @Override
+    public void save(UserProfile username) {
+        userProfileRepository.save(username);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return findUserByUsername(username).get();
     }

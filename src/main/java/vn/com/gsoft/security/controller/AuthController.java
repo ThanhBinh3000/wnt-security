@@ -15,16 +15,17 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
-import vn.com.gsoft.security.model.dto.ChooseNhaThuoc;
-import vn.com.gsoft.security.model.dto.JwtRequest;
-import vn.com.gsoft.security.model.dto.JwtResponse;
-import vn.com.gsoft.security.model.dto.LoginQr;
+import vn.com.gsoft.security.entity.UserProfile;
+import vn.com.gsoft.security.model.dto.*;
 import vn.com.gsoft.security.model.system.BaseResponse;
 import vn.com.gsoft.security.model.system.MessageDTO;
 import vn.com.gsoft.security.model.system.Profile;
+import vn.com.gsoft.security.model.system.Resp;
+import vn.com.gsoft.security.service.ApiService;
 import vn.com.gsoft.security.service.KafkaProducer;
 import vn.com.gsoft.security.service.RedisListService;
 import vn.com.gsoft.security.service.UserService;
@@ -55,11 +56,34 @@ public class AuthController {
     @Autowired
     private RedisListService redisListService;
 
+    @Autowired
+    private ApiService apiService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PostMapping(value = "/login")
     public ResponseEntity<BaseResponse> authenticate(
             @RequestBody @Valid JwtRequest jwtRequest) {
 
         try {
+            UserProfile username = userService.findByUsername(jwtRequest.getUsername());
+            if (username == null) {
+                throw new Exception("Sai tên đăng nhập hoặc mật khẩu!");
+            }
+            if (username.getPassword() == null) {
+                // check pass cũ
+                String confirmLogin = apiService.confirmLogin(jwtRequest.getUsername(), jwtRequest.getPassword());
+                if (confirmLogin == null) {
+                    throw new Exception("Sai tên đăng nhập hoặc mật khẩu!");
+                }
+                Gson gson = new Gson();
+                CheckLogin resp = gson.fromJson(confirmLogin, CheckLogin.class);
+                if(resp.getData()!=null && resp.getData()){
+                    username.setPassword(this.passwordEncoder.encode(jwtRequest.getPassword()));
+                    userService.save(username);
+                }
+            }
+
             // Xác thực từ username và password.
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
