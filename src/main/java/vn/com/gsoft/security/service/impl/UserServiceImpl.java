@@ -133,7 +133,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
         req.setMaNhaThuoc(nhaThuoc.get().getMaNhaThuoc());
         req.setUserIdQueryData(user.get().getId());
         NhaThuocsRes nhaThuocsRes = DataUtils.convertOne(nhaThuocsRepository.getUserRoleNhaThuoc(req), NhaThuocsRes.class);
-        nhaThuoc.get().setRole(nhaThuocsRes.getRole());
+        nhaThuoc.get().setRole(nhaThuocsRes == null ? null: nhaThuocsRes.getRole());
         List<Settings> settings = settingsRepository.findByMaNhaThuoc(nhaThuoc.get().getMaNhaThuoc());
         List<ApplicationSetting> applicationSettings = applicationSettingRepository.findByDrugStoreId(nhaThuoc.get().getMaNhaThuoc());
         // check user có phải user hệ thống không
