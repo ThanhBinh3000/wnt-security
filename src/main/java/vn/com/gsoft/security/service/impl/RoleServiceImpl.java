@@ -31,7 +31,7 @@ public class RoleServiceImpl implements RoleService {
     public List<Role> findByUserId(Long id) {
         List<Role> roles = roleRepository.findByUserId(id);
         for (Role r : roles) {
-            Optional<RoleType> roleId = roleTypeRepository.findById(r.getId());
+            Optional<RoleType> roleId = roleTypeRepository.findById(r.getRoleTypeId());
             roleId.ifPresent(roleType -> r.setRoleType(roleType.getDescripition()));
         }
         return roles;

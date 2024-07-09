@@ -89,6 +89,16 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService, Use
             for (Privilege p : privilegeObjs) {
                 privileges.add(new CodeGrantedAuthority(p.getCode()));
             }
+        }else {
+            List<Role> roleHts = roleService.findByUserId(user.get().getId());
+            roles.addAll(roleHts);
+            List<Long> roleIds = roles.stream()
+                    .map(Role::getId) // Extract the ID from each role
+                    .collect(Collectors.toList());
+            List<Privilege> privilegeObjs = privilegeRepository.findByRoleIdInAndEntityId(roleIds);
+            for (Privilege p : privilegeObjs) {
+                privileges.add(new CodeGrantedAuthority(p.getCode()));
+            }
         }
         return Optional.of(new Profile(
                 user.get().getId(),
