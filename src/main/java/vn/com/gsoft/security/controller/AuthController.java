@@ -121,7 +121,7 @@ public class AuthController {
                 requestAttributes.setAttribute("chooseNhaThuoc", chooseNhaThuoc, RequestAttributes.SCOPE_REQUEST);
             }
             Profile profile = (Profile) authentication.getPrincipal();
-            return ResponseEntity.ok(ResponseUtils.ok(userService.chooseNhaThuoc(jwtToken, profile.getUsername()).get()));
+            return ResponseEntity.ok(ResponseUtils.ok(userService.chooseNhaThuoc(jwtToken, profile.getUsername().toLowerCase()).get()));
         }
         throw new Exception("Lỗi xác thực!");
     }
